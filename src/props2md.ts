@@ -1,56 +1,55 @@
 // 将ts转换为table
-import { resolve, join } from 'node:path'
+import { join } from 'node:path'
 import type { Plugin } from 'vite'
+import type { Column } from './parseInterface'
 import { parseInterface } from './parseInterface'
-import { Column } from './parseInterface'
-
-// 写一个正则表达式 匹配props2table( 括号内的内容 截止到)
-// 1、必须以props2table开头
-// 2、括号内的内容是任意字符
 
 export const reg = /\B@props2table\(.+\)\B/g
 // demo内的应该被忽略掉
 export const inDemo = /(?<=\`)[\s\S]*(?=\`)/g
 export function getParams(code: string) {
-    return code.replace('@props2table(', '')
-        .replace(')', '').split(',')
+  return code.replace('@props2table(', '').replace(')', '').split(',')
 }
-export function matchReg(code:string) {
+export function matchReg(code: string) {
   code = code.replace(inDemo, '')
   return code.matchAll(reg)
 }
 
-
-
 interface Config {
-  /**
-   * @default ['参数', '说明', '类型', '可选值', '默认值']
-   */
-  header: (string | { name: string; textAlign: 'left' | 'right' | 'center'})[]
-  body: (string | ((item: Column) => string))[]
+  header: THeader
+  body: TBody
 }
+
+type THeader = (string | { name: string; textAlign: 'left' | 'right' | 'center' })[]
+type TBody = (string | ((item: Column) => string))[]
+
 const defaultHeader = ['参数', '说明', '类型', '可选值', '默认值']
+
 const defaultBody = ['name', 'description', 'type', 'OptionalValue', 'defaultValue']
-function genTHeader(header) {
+
+function genTHeader(header: THeader) {
   return `<thead>
                 <tr>
                     ${header.map(item => `<th style="white-space: nowrap">${item}</th>`).join('')}
                 </tr>
             </thead>`
 }
+
 function genTBody(members, body) {
   return members.map((item) => {
     return `<tr>
             <td style="white-space: nowrap">${item[body[0]]}</td>
             <td style="white-space: nowrap">${item[body[1]]}</td>
             <td style="white-space: nowrap">${item[body[2]]}</td>
-            <td>${item[body[3]]}</td>
+            <td style="white-space: nowrap">${item[body[3]]}</td>
             <td style="white-space: nowrap">${item[body[4]]}</td>
            </tr>`
   }).join('')
 }
+
+// TODO: footer
 function genTFooter() {
-  console.log(1)
+  return null
 }
 
 function genTable(title, header, bodyConfig, item) {
@@ -60,14 +59,15 @@ function genTable(title, header, bodyConfig, item) {
             ${genTBody(item, bodyConfig)}
            </table>`
 }
-// function
-export function props2table(config?:  Config): Plugin {
+
+export function props2table(config?: Config): Plugin {
   return {
     enforce: 'pre',
     name: 'props2table',
     transform(code, id) {
       if (id.endsWith('.md')) {
         const matches = matchReg(code)
+
         if (matches) {
           for (const match of matches) {
             const [filePath] = getParams(match[0])
@@ -77,18 +77,17 @@ export function props2table(config?:  Config): Plugin {
             code = code.replace(match[0], table)
           }
 
-          //`| Tables        | Are           | Cool  |
+          // `| Tables        | Are           | Cool  |
           // | ------------- |:-------------:| -----:|
           // | col 3 is      | right-aligned | $1600 |
           // | col 2 is      | centered      |   $12 |
           // | zebra stripes | are neat      |    $1 |`
           return {
-            code: code,
+            code,
           }
         }
       }
     },
   }
 }
-
 

@@ -7,17 +7,24 @@ interface T1 {
 interface T11 {
   d: any
 }
+
 type Union = 'a' | 'b' | 'c'
 type Intersection = T1 & T11
 // 会被解析  Will be analyzed
 export interface T2 {
+  /**
+   * @description 名称
+   */
   name: string
+  /**
+   * @description 年龄
+   */
   age: number
   /**
    * @description 性别
+   * @default 男
    */
   sex: '男' | '女'
-  eat: (food: string) => void
   // a: any
   // b: unknown
   // c: bigint
@@ -28,13 +35,19 @@ export interface T2 {
   // opts: Union
 }
 
+export interface Emits {
+  /**
+   * @description 吃点东西
+   */
+  eat: (food: string) => void
+}
 export interface T3 {
   /**
-     * @default yuc
-     */
+   * @default yuc
+   */
   name: string
   /**
-     * @description 年龄
-     */
+   * @description 年龄
+   */
   age: number
 }

@@ -1,4 +1,4 @@
-# Hello VitePress-Plugin-props2table
+# VitePress-Plugin-props2table
 
 
 ## install
@@ -38,13 +38,11 @@ export default defineConfig({
 @props2table(../test/props2.ts)
 
 
+## 自定义 
+
+TODO:
+
 
 ## question
 
 1、 hmr not work when change props path
-
-
-
-
-
-

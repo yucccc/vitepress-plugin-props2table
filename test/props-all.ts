@@ -1,4 +1,4 @@
 export interface TAll1 {
-    name: string
-    age: number
+  name: string
+  age: number
 }
