@@ -40,7 +40,7 @@ function getNode(filePathOrCode: string, interfaceName?: string) {
   const data: RD = {}
   const node = ts.createSourceFile(
     'x.ts',
-      isCode ? filePathOrCode : readFileSync(filePathOrCode, { encoding: 'utf-8' }),
+    isCode ? filePathOrCode : readFileSync(filePathOrCode, { encoding: 'utf-8' }),
     ts.ScriptTarget.Latest,
   )
   node.forEachChild((child) => {
@@ -48,9 +48,9 @@ function getNode(filePathOrCode: string, interfaceName?: string) {
     if (ts.SyntaxKind[child.kind] === 'ImportDeclaration') { }
     // 处理 interface 导出的才进行处理
     if (ts.SyntaxKind[child.kind] === 'InterfaceDeclaration'
-        && getTsType(child.modifiers?.[0].kind) === 'ExportKeyword'
-        // 如果有指定interfaceName 则只处理指定的
-        && (!interfaceName || interfaceName === child.name.escapedText)
+      && getTsType(child.modifiers?.[0].kind) === 'ExportKeyword'
+      // 如果有指定interfaceName 则只处理指定的
+      && (!interfaceName || interfaceName === child.name.escapedText)
     ) {
       data[child.name.escapedText] = []
       child.members.forEach((member) => {
@@ -116,7 +116,7 @@ export function parseInterface(filePathOrCode: string, interfaceName?: string) {
     if (!existsSync(filePathOrCode)) {
       throw new Error(`file not found  ${filePathOrCode}`)
     }
-  } else  {
+  } else {
     isCode = true
   }
   return getNode(filePathOrCode, interfaceName)

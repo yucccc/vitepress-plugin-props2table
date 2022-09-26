@@ -67,14 +67,20 @@ export function props2table(config?: Config): Plugin {
     transform(code, id) {
       if (id.endsWith('.md')) {
         const matches = matchReg(code)
-
+        const hmrPaths = []
         if (matches) {
           for (const match of matches) {
             const [filePath] = getParams(match[0])
             const p = join(__dirname, filePath.trim())
-            const data = parseInterface(p)
-            const table = Object.keys(data).map(title => genTable(title, defaultHeader, defaultBody, data[title])).join('')
-            code = code.replace(match[0], table)
+            try {
+              const data = parseInterface(p)
+              hmrPaths.push(filePath.trim())
+              const table = Object.keys(data).map(title => genTable(title, defaultHeader, defaultBody, data[title])).join('')
+              code = code.replace(match[0], table)
+            } catch (error) {
+
+            }
+
           }
 
           // `| Tables        | Are           | Cool  |
@@ -82,8 +88,9 @@ export function props2table(config?: Config): Plugin {
           // | col 3 is      | right-aligned | $1600 |
           // | col 2 is      | centered      |   $12 |
           // | zebra stripes | are neat      |    $1 |`
+
           return {
-            code,
+            code: code + hmrCode(hmrPaths),
           }
         }
       }
@@ -91,3 +98,9 @@ export function props2table(config?: Config): Plugin {
   }
 }
 
+function hmrCode(paths: string[]) {
+  return `\n<script setup>
+    const demos = import.meta.glob(${JSON.stringify(paths)}, {  eager: true })
+  </script>
+  `
+}

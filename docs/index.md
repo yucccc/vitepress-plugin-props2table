@@ -43,6 +43,3 @@ export default defineConfig({
 TODO:
 
 
-## question
-
-1、 hmr not work when change props path
