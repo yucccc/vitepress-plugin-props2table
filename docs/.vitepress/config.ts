@@ -1,5 +1,5 @@
 import { defineConfig } from 'vitepress'
 
 export default defineConfig({
-    base: './',
+  base: '/vitepress-plugin-props2table/',
 })
