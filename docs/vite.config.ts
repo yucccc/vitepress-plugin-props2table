@@ -2,9 +2,10 @@ import { defineConfig } from 'vite'
 import { props2table } from '../src/index'
 
 export default defineConfig({
+  base: '/props2table/',
   server: {
     open: true,
-    hmr: true
+    hmr: true,
   },
   plugins: [
     props2table(),
