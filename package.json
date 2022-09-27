@@ -18,7 +18,7 @@
   ],
   "scripts": {
     "test": "vitest --w",
-    "docs:dev": "vitepress dev docs",
+    "dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:serve": "vitepress serve docs"
   },
@@ -32,6 +32,7 @@
     "eslint": "^8.23.1",
     "typescript": "^4.8.3",
     "vite": "^3.1.3",
+    "vite-plugin-inspect": "^0.7.4",
     "vitest": "^0.23.4"
   }
 }

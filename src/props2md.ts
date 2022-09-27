@@ -6,22 +6,37 @@ import { parseInterface } from './parseInterface'
 
 export const reg = /\B@props2table\(.+\)\B/g
 // demo内的应该被忽略掉
-export const inDemo = /(?<=\`)[\s\S]*(?=\`)/g
-export function getParams(code: string) {
-  return code.replace('@props2table(', '').replace(')', '').split(',')
+export const inDemo = /\`\`[\s\S]*?\`\`/g
+export function getParams(code: string): [string, Config] {
+  let content = code.replace('@props2table(', '').replace(')', '')
+  const cut = content.indexOf(',')
+  return [
+    cut > 0 ? content.slice(0, cut) : content,
+    cut > 0 ? JSON.parse(content.slice(cut + 1)) : {}
+  ]
 }
 export function matchReg(code: string) {
-  code = code.replace(inDemo, '')
+  code = code.replaceAll(inDemo, '')
+  console.log('-----------------');
+
+  console.log(code);
+
+  console.log('-----------------');
   return code.matchAll(reg)
 }
+
+
 
 interface Config {
   header: THeader
   body: TBody
+  title: string
+  key: string
 }
 
 type THeader = (string | { name: string; textAlign: 'left' | 'right' | 'center' })[]
-type TBody = (string | ((item: Column) => string))[]
+// type TBody = (string | ((item: Column) => string))[]
+type TBody = (string)[]
 
 const defaultHeader = ['参数', '说明', '类型', '可选值', '默认值']
 
@@ -35,14 +50,10 @@ function genTHeader(header: THeader) {
             </thead>`
 }
 
-function genTBody(members, body) {
+function genTBody(members, body: TBody) {
   return members.map((item) => {
     return `<tr>
-            <td style="white-space: nowrap">${item[body[0]]}</td>
-            <td style="white-space: nowrap">${item[body[1]]}</td>
-            <td style="white-space: nowrap">${item[body[2]]}</td>
-            <td style="white-space: nowrap">${item[body[3]]}</td>
-            <td style="white-space: nowrap">${item[body[4]]}</td>
+            ${body.map(bitem => `<td style="white-space: nowrap">${item[bitem]}</td>`).join('\n')}
            </tr>`
   }).join('')
 }
@@ -54,10 +65,10 @@ function genTFooter() {
 
 function genTable(title, header, bodyConfig, item) {
   return `<h2>${title}</h2>
-            <table>
-            ${genTHeader(header)}
-            ${genTBody(item, bodyConfig)}
-           </table>`
+<table>
+${genTHeader(header)}
+${genTBody(item, bodyConfig)}
+</table>`
 }
 
 export function props2table(config?: Config): Plugin {
@@ -70,13 +81,23 @@ export function props2table(config?: Config): Plugin {
         const hmrPaths = []
         if (matches) {
           for (const match of matches) {
-            const [filePath] = getParams(match[0])
+            const [filePath, params] = getParams(match[0])
+
+            console.log(getParams(match[0]));
+
+            const { key, header, body, title: customTitle } = params
+
             const p = join(__dirname, filePath.trim())
             try {
+
               const data = parseInterface(p)
               hmrPaths.push(filePath.trim())
-              const table = Object.keys(data).map(title => genTable(title, defaultHeader, defaultBody, data[title])).join('')
+              let table = (key ? [key] : Object.keys(data))
+                .map(title => genTable(customTitle || title, header || defaultHeader, body || defaultBody, data[title]))
+                .join('')
+
               code = code.replace(match[0], table)
+
             } catch (error) {
 
             }

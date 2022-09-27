@@ -1,10 +1,24 @@
-export interface Props2 {
+
+
+export interface Props {
    /**
-      * @default yuc
-      */
+    * @default yuc
+    */
    name: string
    /**
-      * @description 年龄
-      */
+    * @description 年龄
+    */
    age: number
 }
+
+export interface Props2 {
+   /**
+    * @default yuc
+    */
+   name: string
+   /**
+    * @description 年龄
+    */
+   age: number
+}
+
