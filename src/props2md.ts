@@ -43,19 +43,22 @@ const defaultHeader = ['参数', '说明', '类型', '可选值', '默认值']
 const defaultBody = ['name', 'description', 'type', 'OptionalValue', 'defaultValue']
 
 function genTHeader(header: THeader) {
-  return `<thead>
-                <tr>
-                    ${header.map(item => `<th style="white-space: nowrap">${item}</th>`).join('')}
-                </tr>
-            </thead>`
+  return `  <thead>
+    <tr>
+      ${header.map(item => `<th style="white-space: nowrap">${item}</th>`).join('\n      ')}
+    </tr>
+  </thead>`
 }
 
 function genTBody(members, body: TBody) {
-  return members.map((item) => {
+  return `  <tbody>
+    ${members.map((item) => {
     return `<tr>
-            ${body.map(bitem => `<td style="white-space: nowrap">${item[bitem]}</td>`).join('\n')}
-           </tr>`
-  }).join('')
+      ${body.map(bitem => `<td style="white-space: nowrap">${item[bitem]}</td>`).join('\n      ')}
+    </tr>`
+  }).join('\n   ')}
+  </tbody>
+  `
 }
 
 // TODO: footer
@@ -63,12 +66,14 @@ function genTFooter() {
   return null
 }
 
-function genTable(title, header, bodyConfig, item) {
-  return `<h2>${title}</h2>
+function genTable(title: string, header: THeader, body: TBody, item) {
+  return `
+<h2>${title}</h2>
 <table>
 ${genTHeader(header)}
-${genTBody(item, bodyConfig)}
-</table>`
+${genTBody(item, body)}
+</table>
+`
 }
 
 export function props2table(config?: Config): Plugin {
