@@ -1,31 +1,32 @@
 // 将ts转换为table
 import { join } from 'node:path'
 import type { Plugin } from 'vite'
-import type { Column } from './parseInterface'
 import { parseInterface } from './parseInterface'
+// TODO:
+// 1、点击复制
+// 2、传参问题
+// 3、替换规则bug
 
 export const reg = /\B@props2table\(.+\)\B/g
 // demo内的应该被忽略掉
 export const inDemo = /\`\`[\s\S]*?\`\`/g
 export function getParams(code: string): [string, Config] {
-  let content = code.replace('@props2table(', '').replace(')', '')
+  const content = code.replace('@props2table(', '').replace(')', '')
   const cut = content.indexOf(',')
   return [
     cut > 0 ? content.slice(0, cut) : content,
-    cut > 0 ? JSON.parse(content.slice(cut + 1)) : {}
+    cut > 0 ? JSON.parse(content.slice(cut + 1)) : {},
   ]
 }
 export function matchReg(code: string) {
   code = code.replaceAll(inDemo, '')
-  console.log('-----------------');
+  console.log('-----------------')
 
-  console.log(code);
+  console.log(code)
 
-  console.log('-----------------');
+  console.log('-----------------')
   return code.matchAll(reg)
 }
-
-
 
 interface Config {
   header: THeader
@@ -76,7 +77,7 @@ ${genTBody(item, body)}
 `
 }
 
-export function props2table(config?: Config): Plugin {
+export function props2table(config?: Record<string | 'default', Config> | Config): Plugin {
   return {
     enforce: 'pre',
     name: 'props2table',
@@ -88,25 +89,23 @@ export function props2table(config?: Config): Plugin {
           for (const match of matches) {
             const [filePath, params] = getParams(match[0])
 
-            console.log(getParams(match[0]));
+            console.log(getParams(match[0]))
 
             const { key, header, body, title: customTitle } = params
 
             const p = join(__dirname, filePath.trim())
             try {
-
               const data = parseInterface(p)
               hmrPaths.push(filePath.trim())
-              let table = (key ? [key] : Object.keys(data))
+              const table = (key ? [key] : Object.keys(data))
                 .map(title => genTable(customTitle || title, header || defaultHeader, body || defaultBody, data[title]))
                 .join('')
 
               code = code.replace(match[0], table)
-
-            } catch (error) {
+            }
+            catch (error) {
 
             }
-
           }
 
           // `| Tables        | Are           | Cool  |

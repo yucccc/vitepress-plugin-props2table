@@ -1,5 +1,4 @@
-import { expect, test } from 'vitest'
-import { inDemo, reg, matchReg, } from '../src/props2md'
+import { test } from 'vitest'
 
 /**
  * 写一个正则表达式
@@ -7,8 +6,6 @@ import { inDemo, reg, matchReg, } from '../src/props2md'
  * 匹配@props2table(../test/props2.ts, { "key": "Props2" } )
  */
 const regg = /(?<=\`\`\`markdown)[\s\S]*?(?=\`\`\`)/g
-
-
 
 test.only('reg ✅', () => {
   // 匹配 props2table 后的内容 在空格前停止
@@ -20,14 +17,5 @@ test.only('reg ✅', () => {
     @props2table(../test/props2.ts, { "key": "Props3" } )
 
   `
-
-
-
-
-
-
-
-
 })
-
 

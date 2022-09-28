@@ -1,4 +1,4 @@
-import { readFileSync, existsSync } from 'node:fs'
+import { existsSync, readFileSync } from 'node:fs'
 import ts from 'typescript'
 const map = {
   StringKeyword: 'string',
@@ -101,7 +101,7 @@ function getNode(filePathOrCode: string, interfaceName?: string) {
           description: description || comments.description,
           defaultValue: comments.default,
           OptionalValue: comments.optional,
-          required: true
+          required: true,
         })
       })
     }
@@ -116,7 +116,8 @@ export function parseInterface(filePathOrCode: string, interfaceName?: string) {
     if (!existsSync(filePathOrCode)) {
       throw new Error(`file not found  ${filePathOrCode}`)
     }
-  } else {
+  }
+  else {
     isCode = true
   }
   return getNode(filePathOrCode, interfaceName)

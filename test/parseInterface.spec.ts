@@ -1,6 +1,6 @@
-import { parseInterface } from '../src/parseInterface';
-import { test, expect } from 'vitest'
 import { join } from 'node:path'
+import { expect, test } from 'vitest'
+import { parseInterface } from '../src/parseInterface'
 
 // test('parseInterface get one no jsdoc', () => {
 
@@ -62,33 +62,33 @@ import { join } from 'node:path'
 // })
 
 test('parseInterface get one with jsdoc', () => {
-    const data2 = parseInterface(join(__dirname, './props.ts'), 'T3')
-    expect(data2).toEqual({
-        "T3": [
-            {
-                name: 'name',
-                type: 'string',
-                sourceType: {
-                    type: 'string'
-                },
-                description: undefined,
-                defaultValue: 'yuc',
-                OptionalValue: undefined,
-                required: true
-            },
-            {
-                name: 'age',
-                type: 'number',
-                sourceType: {
-                    type: 'number'
-                },
-                description: '年龄',
-                defaultValue: undefined,
-                OptionalValue: undefined,
-                required: true
-            },
+  const data2 = parseInterface(join(__dirname, './props.ts'), 'T3')
+  expect(data2).toEqual({
+    T3: [
+      {
+        name: 'name',
+        type: 'string',
+        sourceType: {
+          type: 'string',
+        },
+        description: undefined,
+        defaultValue: 'yuc',
+        OptionalValue: undefined,
+        required: true,
+      },
+      {
+        name: 'age',
+        type: 'number',
+        sourceType: {
+          type: 'number',
+        },
+        description: '年龄',
+        defaultValue: undefined,
+        OptionalValue: undefined,
+        required: true,
+      },
 
-        ]
-    })
+    ],
+  })
 })
 

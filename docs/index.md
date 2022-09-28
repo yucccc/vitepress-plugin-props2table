@@ -18,7 +18,7 @@ import { props2table } from 'vitepress-plugin-props2table'
 
 export default defineConfig({
     plugins: [
-        props2table(),
+        props2table({}),
     ],
 })
 ```

@@ -1,24 +1,22 @@
-
-
 export interface Props {
-   /**
+  /**
     * @default yuc
     */
-   name: string
-   /**
+  name: string
+  /**
     * @description 年龄
     */
-   age: number
+  age: number
 }
 
 export interface Props2 {
-   /**
+  /**
     * @default yuc
     */
-   name: string
-   /**
+  name: string
+  /**
     * @description 年龄
     */
-   age: number
+  age: number
 }
 

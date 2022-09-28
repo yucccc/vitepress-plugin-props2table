@@ -39,7 +39,7 @@ export interface Emits {
   /**
    * @description 吃点东西
    */
-  eat: (food: string) => void
+  eat: (foods: string) => void
 }
 export interface T3 {
   /**
