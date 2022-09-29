@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite'
 import Inspect from 'vite-plugin-inspect'
+
 import { props2table } from '../src/index'
 
 export default defineConfig({

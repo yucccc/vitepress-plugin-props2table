@@ -1,30 +1,51 @@
 {
   "name": "vitepress-plugin-props2table",
   "type": "module",
-  "version": "0.0.2",
+  "version": "0.0.4",
   "private": false,
   "description": "",
   "author": "yucccc",
   "license": "ISC",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/yucccc/vitepress-plugin-props2table.git",
+    "directory": "src"
+  },
   "keywords": [
     "vitepress",
     "markdown",
     "propsToTable"
   ],
-  "main": "src/index.ts",
-  "module": "src/index.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "main": "./dist/index.cjs",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
   "files": [
-    "src"
+    "dist"
   ],
+  "engines": {
+    "node": "^14.18.0 || >=16.0.0"
+  },
   "scripts": {
-    "test": "vitest --w",
-    "dev": "vitepress dev docs",
+    "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:serve": "vitepress serve docs",
-    "lint:fix": "eslint . --fix"
+    "lint:fix": "eslint . --fix",
+    "prepublishOnly": "npm run build",
+    "test": "vitest --w",
+    "dev": "unbuild --stub",
+    "build": "unbuild"
   },
   "dependencies": {
+    "unbuild": "^0.8.11",
     "vitepress": "1.0.0-alpha.16",
+    "vitepress-plugin-props2table": "0.0.4",
     "vue": "^3.2.39"
   },
   "devDependencies": {

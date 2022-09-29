@@ -14,10 +14,11 @@ const map = {
   VoidKeyword: 'void',
 }
 
-function getType(kind) {
+function getType(kind: number) {
+  // @ts-expect-error TODO
   return map[ts.SyntaxKind[kind]]
 }
-function getTsType(kind) {
+function getTsType(kind: number) {
   return ts.SyntaxKind[kind]
 }
 export interface Column {
@@ -45,14 +46,20 @@ function getNode(filePathOrCode: string, interfaceName?: string) {
   )
   node.forEachChild((child) => {
     // 处理导入 需要再次解析导入的数据
-    if (ts.SyntaxKind[child.kind] === 'ImportDeclaration') { }
+    if (ts.SyntaxKind[child.kind] === 'ImportDeclaration') {
+      console.log('ImportDeclaration')
+    }
     // 处理 interface 导出的才进行处理
     if (ts.SyntaxKind[child.kind] === 'InterfaceDeclaration'
+    // @ts-expect-error TODO
       && getTsType(child.modifiers?.[0].kind) === 'ExportKeyword'
       // 如果有指定interfaceName 则只处理指定的
+    // @ts-expect-error TODO
       && (!interfaceName || interfaceName === child.name.escapedText)
     ) {
+      // @ts-expect-error TODO
       data[child.name.escapedText] = []
+      // @ts-expect-error TODO
       child.members.forEach((member) => {
         const { jsDoc } = member
         let description = ''
@@ -64,42 +71,53 @@ function getNode(filePathOrCode: string, interfaceName?: string) {
             description = jsDoc.comment
           }
           else {
-            jsDoc.forEach((doc) => {
+            jsDoc.forEach((doc: any) => {
               const { tags } = doc
               if (tags) {
+                // @ts-expect-error TODO
                 tags.forEach((tag) => {
+                  // @ts-expect-error TODO
                   comments[tag.tagName.escapedText] = tag.comment
                 })
               }
               else {
+                // @ts-expect-error TODO
                 comments.description = doc.comment
               }
             })
           }
         }
+        // @ts-expect-error TODO
         let type = map[ts.SyntaxKind[member.type.kind]]
         sourceType.type = type
         if (type === 'union') {
+          // @ts-expect-error TODO
           sourceType.types = member.type.types.map((item) => {
+            // @ts-expect-error TODO
             return map[ts.SyntaxKind[item.kind]] || item.literal?.text
           })
           type = sourceType.types.join(' | ')
         }
         if (type === 'function') {
           sourceType.parameters = []
+          // @ts-expect-error TODO
           member.type.parameters.forEach((item) => {
             sourceType.parameters.push([item.name.escapedText, getType(item.type.kind)])
           })
           sourceType.returnType = getType(member.type.type.kind)
+          // @ts-expect-error TODO
           type = `(${sourceType.parameters.map(item => item.join(':')).join(', ')}) => ${sourceType.returnType}`
         }
-
+        // @ts-expect-error TODO
         data[child.name.escapedText].push({
           name: member.name.escapedText,
           type,
           sourceType,
+          // @ts-expect-error TODO
           description: description || comments.description,
+          // @ts-expect-error TODO
           defaultValue: comments.default,
+          // @ts-expect-error TODO
           OptionalValue: comments.optional,
           required: true,
         })

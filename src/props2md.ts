@@ -50,10 +50,10 @@ function genTHeader(header: THeader) {
     </tr>
   </thead>`
 }
-
+// @ts-expect-error TODO
 function genTBody(members, body: TBody) {
   return `  <tbody>
-    ${members.map((item) => {
+    ${members.map((item: any) => {
     return `<tr>
       ${body.map(bitem => `<td style="white-space: nowrap">${item[bitem]}</td>`).join('\n      ')}
     </tr>`
@@ -67,7 +67,7 @@ function genTFooter() {
   return null
 }
 
-function genTable(title: string, header: THeader, body: TBody, item) {
+function genTable(title: string, header: THeader, body: TBody, item: any) {
   return `
 <h2>${title}</h2>
 <table>
@@ -76,13 +76,13 @@ ${genTBody(item, body)}
 </table>
 `
 }
-
 export function props2table(config?: Record<string | 'default', Config> | Config): Plugin {
   return {
     enforce: 'pre',
     name: 'props2table',
     transform(code, id) {
       if (id.endsWith('.md')) {
+        console.log(config)
         const matches = matchReg(code)
         const hmrPaths = []
         if (matches) {
