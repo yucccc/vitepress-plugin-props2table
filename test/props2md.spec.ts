@@ -1,4 +1,4 @@
-import { test } from 'vitest'
+import { test, expect } from 'vitest'
 
 /**
  * 写一个正则表达式
@@ -7,7 +7,7 @@ import { test } from 'vitest'
  */
 const regg = /(?<=\`\`\`markdown)[\s\S]*?(?=\`\`\`)/g
 
-test.only('reg ✅', () => {
+test('reg ✅', () => {
   // 匹配 props2table 后的内容 在空格前停止
   const code = `
     \`\`\`markdown
@@ -17,5 +17,6 @@ test.only('reg ✅', () => {
     @props2table(../test/props2.ts, { "key": "Props3" } )
 
   `
+  expect(1 + 1).toBe(2)
 })
 
