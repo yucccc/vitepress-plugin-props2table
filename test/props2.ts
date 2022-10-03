@@ -7,6 +7,7 @@ export interface Props {
     * @description 年龄
     */
   age: number
+  a: (p1: string) => void
 }
 
 export interface Props2 {

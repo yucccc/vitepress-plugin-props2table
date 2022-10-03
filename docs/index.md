@@ -24,6 +24,7 @@ export default defineConfig({
 ```
 
 
+
 2、add command in markdown
 
 ```markdown
@@ -35,3 +36,4 @@ export default defineConfig({
 3、and you will see a table
 
 @props2table(../test/props-all.ts)
+
