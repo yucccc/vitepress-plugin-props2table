@@ -1,142 +1,192 @@
-import { existsSync, readFileSync } from 'node:fs'
-import ts from 'typescript'
-const map = {
-  StringKeyword: 'string',
-  NumberKeyword: 'number',
-  BooleanKeyword: 'boolean',
-  NullKeyword: 'null',
-  UndefinedKeyword: 'undefined',
-  SymbolKeyword: 'symbol',
-  AnyKeyword: 'any',
-  UnionType: 'union',
-  FunctionType: 'function',
-  IntersectionType: 'intersection',
-  VoidKeyword: 'void',
+import { parse } from '@babel/parser'
+import type { ParserPlugin, ParseResult } from '@babel/parser'
+import { visit, ASTNode } from 'ast-types'
+import { get, isArray } from 'lodash-es'
+
+const defaultParserPlugin: ParserPlugin[] = ["typescript"]
+
+export function parseCode(code: string, plugins: ParserPlugin[] = []): ParseResult<any> {
+    return parse(code, {
+        sourceType: "module",
+        plugins: defaultParserPlugin.concat(plugins),
+    });
 }
 
-function getType(kind: number) {
-  // @ts-expect-error TODO
-  return map[ts.SyntaxKind[kind]]
-}
-function getTsType(kind: number) {
-  return ts.SyntaxKind[kind]
-}
-export interface Column {
-  name: string
-  type: string
-  /**
-   * 原始解析 用户可能有自定义需求
-   */
-  sourceType: any
-  description: string
-  defaultValue: string
-  OptionalValue: string
-  required: boolean
-}
-interface RD {
-  [key: string]: Column[]
-}
-let isCode = false
-function getNode(filePathOrCode: string, interfaceName?: string) {
-  const data: RD = {}
-  const node = ts.createSourceFile(
-    'x.ts',
-    isCode ? filePathOrCode : readFileSync(filePathOrCode, { encoding: 'utf-8' }),
-    ts.ScriptTarget.Latest,
-  )
-  node.forEachChild((child) => {
-    // 处理导入 需要再次解析导入的数据
-    if (ts.SyntaxKind[child.kind] === 'ImportDeclaration') {
-      console.log('ImportDeclaration')
-    }
-    // 处理 interface 导出的才进行处理
-    if (ts.SyntaxKind[child.kind] === 'InterfaceDeclaration'
-    // @ts-expect-error TODO
-      && getTsType(child.modifiers?.[0].kind) === 'ExportKeyword'
-      // 如果有指定interfaceName 则只处理指定的
-    // @ts-expect-error TODO
-      && (!interfaceName || interfaceName === child.name.escapedText)
-    ) {
-      // @ts-expect-error TODO
-      data[child.name.escapedText] = []
-      // @ts-expect-error TODO
-      child.members.forEach((member) => {
-        const { jsDoc } = member
-        let description = ''
-        const comments = {}
-        const sourceType: any = {}
-        if (jsDoc) {
-          // 用户只写了一行Jsdoc注释 默认认为是描述
-          if (jsDoc.comment) {
-            description = jsDoc.comment
-          }
-          else {
-            jsDoc.forEach((doc: any) => {
-              const { tags } = doc
-              if (tags) {
-                // @ts-expect-error TODO
-                tags.forEach((tag) => {
-                  // @ts-expect-error TODO
-                  comments[tag.tagName.escapedText] = tag.comment
-                })
-              }
-              else {
-                // @ts-expect-error TODO
-                comments.description = doc.comment
-              }
-            })
-          }
-        }
-        // @ts-expect-error TODO
-        let type = map[ts.SyntaxKind[member.type.kind]]
-        sourceType.type = type
-        if (type === 'union') {
-          // @ts-expect-error TODO
-          sourceType.types = member.type.types.map((item) => {
-            // @ts-expect-error TODO
-            return map[ts.SyntaxKind[item.kind]] || item.literal?.text
-          })
-          type = sourceType.types.join(' | ')
-        }
-        if (type === 'function') {
-          sourceType.parameters = []
-          // @ts-expect-error TODO
-          member.type.parameters.forEach((item) => {
-            sourceType.parameters.push([item.name.escapedText, getType(item.type.kind)])
-          })
-          sourceType.returnType = getType(member.type.type.kind)
-          // @ts-expect-error TODO
-          type = `(${sourceType.parameters.map(item => item.join(':')).join(', ')}) => ${sourceType.returnType}`
-        }
-        // @ts-expect-error TODO
-        data[child.name.escapedText].push({
-          name: member.name.escapedText,
-          type,
-          sourceType,
-          // @ts-expect-error TODO
-          description: description || comments.description,
-          // @ts-expect-error TODO
-          defaultValue: comments.default,
-          // @ts-expect-error TODO
-          OptionalValue: comments.optional,
-          required: true,
-        })
-      })
-    }
-  })
-
-  return data
+function findInterfaces(node: ASTNode) {
+    let ret = Object.create(null);
+    visit(node, {
+        visitTSInterfaceDeclaration(nodePath) {
+            // 只有导出的interface才会被解析
+            if (nodePath.parentPath.value.type === 'ExportNamedDeclaration') {
+                ret[nodePath.value.id.name] = nodePath.value.body.body
+            }
+            this.traverse(nodePath)
+        },
+    });
+    return ret;
 }
 
-export function parseInterface(filePathOrCode: string, interfaceName?: string) {
-  if (filePathOrCode.startsWith('/') || filePathOrCode.startsWith('.')) {
-    isCode = false
-    if (!existsSync(filePathOrCode)) {
-      throw new Error(`file not found  ${filePathOrCode}`)
-    }
-  }
-  else {
-    isCode = true
-  }
-  return getNode(filePathOrCode, interfaceName)
+// function parseTSTypeReference(typeName) {
+//     const type = get(typeName, "type");
+
+//     switch (type) {
+//         case "TSQualifiedName":
+//             return `${get(typeName, "left.name")}.${get(typeName, "right.name")}`;
+//         default:
+//             return `Unknown ReferenceType`;
+//     }
+// }
+
+function parseTSFunctionType(parameters: any[], typeAnnotation: any) {
+    const parseTSFunctionParameters = (parameters: any[]) => {
+        if (!parameters || !parameters.length) {
+            return `()`;
+        }
+        let args = parameters.map((parameter) => {
+            return `${get(parameter, "name")}${parameter.optional ? '?' : ''}: ${parseTypeAnnotation(
+                get(parameter, "typeAnnotation.typeAnnotation")
+            )}`;
+        });
+        return "(" + args.join(", ") + ")";
+    };
+    return `${parseTSFunctionParameters(parameters)} => ${parseTypeAnnotation(typeAnnotation)}`;
 }
+
+function parseTSTypeLiteral(members: any[]) {
+    const ret = parseInterfaceDefinitions(members);
+    let args = ret.map((t) => `${t.name}: ${t.type}`);
+    return "{" + args.join(", ") + "}";
+}
+function parseTSArrayType(type: string | string[]) {
+    return isArray(type) ? `(${type.join(' | ')})[]` : `${type}[]`
+}
+
+function parseTSLiteralType(Node: Node) {
+    return get(Node, "literal.value")
+}
+
+function parseTypeAnnotation(typeAnnotation: any): any {
+    const type = get(typeAnnotation, "type");
+
+    switch (type) {
+        case "TSNumberKeyword":
+        case "TSStringKeyword":
+        case "TSBooleanKeyword":
+        case "TSNullKeyword":
+        case "TSUndefinedKeyword":
+        case "TSSymbolKeyword":
+        case "TSAnyKeyword":
+        case "TSVoidKeyword":
+        case "TSNeverKeyword":
+        case "TSUnknownKeyword":
+            return type.match(/TS(\w+)Keyword/)[1].toLowerCase();
+        case "TSLiteralType":
+            return parseTSLiteralType(typeAnnotation)
+        case "TSArrayType":
+            return parseTSArrayType(
+                parseTypeAnnotation(
+                    get(typeAnnotation, "elementType")
+                )
+            )
+        case "TSUnionType":
+            return get(typeAnnotation, "types", [])
+                .map((node: any) => parseTypeAnnotation(node))
+                .join(' | ')
+        case "TSFunctionType":
+            const parameters = get(typeAnnotation, "parameters")
+            return parseTSFunctionType(
+                parameters,
+                get(typeAnnotation, "typeAnnotation.typeAnnotation")
+            );
+
+        case "TSTypeReference":
+            const typeName = get(typeAnnotation, "typeName.name")
+            const typeParameters = get(typeAnnotation, "typeParameters.params", []).map(parseTypeAnnotation)
+            return `${typeName}${typeParameters.length ?
+                `<${typeParameters.join(', ')}>`
+                : typeParameters
+                }`
+        case "TSTypeLiteral":
+            return parseTSTypeLiteral(get(typeAnnotation, "members"));
+        // (any)[]
+        case "TSParenthesizedType":
+            return `(${parseTypeAnnotation(get(typeAnnotation, 'typeAnnotation'))})`
+        default:
+            return type;
+    }
+}
+// 一行注释默认都解析为description 在有Jsdoc的情况下会被覆盖
+function parseLineBlock() {
+
+}
+/**
+ * 把多行注释解析为对象
+ * @description 一行注释
+ */
+// 解析jsdoc @作为key value的注释
+const jsDocReg = /@(\w+)\s+(.+)/
+
+function parseCommentBlock(jsDoc: string) {
+    /**
+     * 不使用matchAll 因为解析无法区分带@和不带@的情况
+     */
+    return jsDoc.replaceAll(/[\/\*]/g, '').split('\n').reduce((a, line) => {
+
+        if (line.includes('@')) {
+            const match = jsDocReg.exec(line)
+            if (match) {
+                a[match[1]] = match[2]
+            }
+        } else {
+            // 匹配任意不为空的字符
+            const match = /\S+/.exec(line)
+            if (match) {
+                a['description'] = match[0]
+            }
+        }
+
+        return a
+    }, Object.create(null))
+}
+function parseComments(comments: any) {
+    return comments.reduce((a: any, c: any) => {
+        const comment = parseCommentBlock(c.value)
+        return Object.assign(a, comment)
+    }, Object.create(null))
+}
+function parseInterfaceDefinitions(nodePaths: any): any[] {
+    const parseInterfaceDefinitionsNode = (nodePath: any) => {
+        const name = get(nodePath, "key.name");
+        const required = !get(nodePath, "optional")
+        const comments = parseComments(get(nodePath, "leadingComments", []))
+        const typeAnnotation = get(nodePath, "typeAnnotation.typeAnnotation");
+        const type = parseTypeAnnotation(typeAnnotation);
+        return { name, type, comments, required };
+    };
+
+    return nodePaths.map(parseInterfaceDefinitionsNode);
+}
+
+type CommentType = 'description' | 'default' | 'options'
+
+export interface InterfaceDefinition {
+    name: string;
+    type: string;
+    required: boolean;
+    comments: Record<CommentType | string, string>
+}
+
+export function parseInterface(code: string, parsePlugins?: ParserPlugin[]): Record<string, InterfaceDefinition[]> {
+
+    const ast = parseCode(code, parsePlugins);
+
+    const interfaces = findInterfaces(ast);
+
+    const definitions = Object.keys(interfaces).reduce((a, c) => {
+        a[c] = parseInterfaceDefinitions(interfaces[c])
+        return a;
+    }, Object.create(null));
+
+    return definitions;
+}
+

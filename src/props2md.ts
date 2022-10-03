@@ -1,11 +1,10 @@
 // 将ts转换为table
 import { join } from 'node:path'
 import type { Plugin } from 'vite'
+import fs from 'node:fs'
 import { parseInterface } from './parseInterface'
-// TODO:
-// 1、点击复制
-// 2、传参问题
-// 3、替换规则bug
+import { get } from 'lodash-es'
+import type { InterfaceDefinition } from './parseInterface'
 
 export const reg = /\B@props2table\(.+\)\B/g
 // demo内的应该被忽略掉
@@ -20,11 +19,6 @@ export function getParams(code: string): [string, Config] {
 }
 export function matchReg(code: string) {
   code = code.replaceAll(inDemo, '')
-  console.log('-----------------')
-
-  console.log(code)
-
-  console.log('-----------------')
   return code.matchAll(reg)
 }
 
@@ -39,9 +33,9 @@ type THeader = (string | { name: string; textAlign: 'left' | 'right' | 'center' 
 // type TBody = (string | ((item: Column) => string))[]
 type TBody = (string)[]
 
-const defaultHeader = ['参数', '说明', '类型', '可选值', '默认值']
+const defaultHeader = ['参数', '说明', '类型', '是否必填', '可选值', '默认值']
 
-const defaultBody = ['name', 'description', 'type', 'OptionalValue', 'defaultValue']
+const defaultBody = ['name', 'comments.description', 'type', 'required', 'comments.options', 'comments.default']
 
 function genTHeader(header: THeader) {
   return `  <thead>
@@ -53,9 +47,9 @@ function genTHeader(header: THeader) {
 // @ts-expect-error TODO
 function genTBody(members, body: TBody) {
   return `  <tbody>
-    ${members.map((item: any) => {
+    ${members.map((item: InterfaceDefinition) => {
     return `<tr>
-      ${body.map(bitem => `<td style="white-space: nowrap">${item[bitem]}</td>`).join('\n      ')}
+      ${body.map(b => `<td style="white-space: nowrap">${get(item, b)}</td>`).join('\n      ')}
     </tr>`
   }).join('\n   ')}
   </tbody>
@@ -82,20 +76,19 @@ export function props2table(config?: Record<string | 'default', Config> | Config
     name: 'props2table',
     transform(code, id) {
       if (id.endsWith('.md')) {
-        console.log(config)
+
         const matches = matchReg(code)
         const hmrPaths = []
         if (matches) {
           for (const match of matches) {
             const [filePath, params] = getParams(match[0])
 
-            console.log(getParams(match[0]))
 
             const { key, header, body, title: customTitle } = params
 
             const p = join(__dirname, filePath.trim())
             try {
-              const data = parseInterface(p)
+              const data = parseInterface(fs.readFileSync(p, 'utf-8'))
               hmrPaths.push(filePath.trim())
               const table = (key ? [key] : Object.keys(data))
                 .map(title => genTable(customTitle || title, header || defaultHeader, body || defaultBody, data[title]))
@@ -124,8 +117,9 @@ export function props2table(config?: Record<string | 'default', Config> | Config
 }
 
 function hmrCode(paths: string[]) {
-  return `\n<script setup>
-    const demos = import.meta.glob(${JSON.stringify(paths)}, {  eager: true })
-  </script>
+  return `
+<script setup>
+  const hmrFiles = import.meta.glob(${JSON.stringify(paths)}, {  eager: true })
+</script>
   `
 }
