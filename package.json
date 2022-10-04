@@ -1,7 +1,7 @@
 {
   "name": "vitepress-plugin-props2table",
   "type": "module",
-  "version": "0.0.6",
+  "version": "0.0.8",
   "private": false,
   "description": "",
   "author": "yucccc",
@@ -45,14 +45,22 @@
   "dependencies": {
     "@babel/parser": "^7.19.3",
     "ast-types": "^0.14.2",
+    "get-caller-file": "^2.0.5",
+    "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
+    "lodash.get": "^4.4.2",
+    "lodash.isstring": "^4.0.1",
+    "lodash.merge": "^4.6.2",
     "unbuild": "^0.8.11",
     "vitepress": "1.0.0-alpha.16",
-    "vitepress-plugin-props2table": "0.0.4",
     "vue": "^3.2.39"
   },
   "devDependencies": {
+    "@types/lodash": "^4.14.186",
+    "@types/lodash.get": "^4.4.7",
+    "@types/lodash.isstring": "^4.0.7",
     "@types/lodash-es": "^4.17.6",
+    "@types/lodash.merge": "^4.6.7",
     "@types/node": "^18.7.18",
     "@vitest/coverage-c8": "^0.23.4",
     "@vitest/coverage-istanbul": "^0.23.4",

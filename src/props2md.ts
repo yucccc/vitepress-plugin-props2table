@@ -1,9 +1,12 @@
 // 将ts转换为table
-import { join } from 'node:path'
+import { resolve } from 'node:path'
+import getCallerFile from 'get-caller-file';
 import type { Plugin } from 'vite'
 import fs from 'node:fs'
 import { parseInterface } from './parseInterface'
-import { get, isFunction, isObject, isString, merge } from 'lodash-es'
+import get from 'lodash.get'
+import merge from 'lodash.merge'
+import isString from 'lodash.isstring'
 import type { InterfaceDefinition } from './parseInterface'
 
 export const matchReg = /@props2table\((.+)\)/g
@@ -37,7 +40,7 @@ export function replaceCode2table(
     id = normalizeParam(id)
     interfaceName = normalizeParam(interfaceName)
 
-    const path = join(__dirname, filePath)
+    const path = resolve(dir.replace('file://', ''), '..', filePath)
 
     const tableData = parseInterface(fs.readFileSync(path, 'utf-8'))
 
@@ -158,9 +161,12 @@ const defaultConfig = {
     ]
   }
 }
+let dir: string = ''
 export function props2table(
   config: PluginConfig = {}
 ): Plugin {
+  dir = getCallerFile()
+
 
   return {
     enforce: 'pre',
