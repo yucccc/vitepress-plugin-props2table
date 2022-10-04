@@ -3,53 +3,82 @@ import { join } from 'node:path'
 import type { Plugin } from 'vite'
 import fs from 'node:fs'
 import { parseInterface } from './parseInterface'
-import { get } from 'lodash-es'
+import { get, isFunction, isObject, isString, merge } from 'lodash-es'
 import type { InterfaceDefinition } from './parseInterface'
 
-export const reg = /\B@props2table\(.+\)\B/g
-// demo内的应该被忽略掉
-export const inDemo = /\`\`[\s\S]*?\`\`/g
-export function getParams(code: string): [string, Config] {
-  const content = code.replace('@props2table(', '').replace(')', '')
-  const cut = content.indexOf(',')
-  return [
-    cut > 0 ? content.slice(0, cut) : content,
-    cut > 0 ? JSON.parse(content.slice(cut + 1)) : {},
-  ]
+export const matchReg = /@props2table\((.+)\)/g
+
+// demo内的应该被忽略
+export const inDemoReg = /\`{2,3}[\s\S]*?\`{2,3}/g
+
+function getCodeIndex(code: string) {
+  if (code.includes('@')) {
+    return [...code.matchAll(inDemoReg)].map(item => [item.index, item.index! + item[0].length])
+  }
+  return []
 }
-export function matchReg(code: string) {
-  code = code.replaceAll(inDemo, '')
-  return code.matchAll(reg)
+export function replaceCode2table(
+  code: string,
+  replaceConfig: PluginConfig
+) {
+  const demoScope = getCodeIndex(code)
+  const hmrPaths: string[] = []
+  const c2t = code.replaceAll(matchReg, (substring, params: string, index: number) => {
+
+    // demo内不进行替换
+    for (let i = 0; i < demoScope.length; i++) {
+      const element = demoScope[i];
+      if (index > element[0]! && index < element[1]!) {
+        return substring
+      }
+    }
+    let [filePath, id = 'default', interfaceName] = params.split(',')
+    filePath = normalizeParam(filePath)
+    id = normalizeParam(id)
+    interfaceName = normalizeParam(interfaceName)
+
+    const path = join(__dirname, filePath)
+
+    const tableData = parseInterface(fs.readFileSync(path, 'utf-8'))
+
+    const config = replaceConfig[id]
+
+    hmrPaths.push(filePath)
+    return (interfaceName ? [interfaceName] : Object.keys(tableData)).map(title => {
+      return genTable(title, config, tableData[title])
+    }).join('')
+
+  })
+  return c2t + hmrCode(hmrPaths)
 }
 
-interface Config {
-  header: THeader
-  body: TBody
-  title: string
-  key: string
+function normalizeParam(str: string) {
+  if (str) {
+    return str.replaceAll(/['"]/g, '').trim()
+  }
+  return ''
 }
 
-type THeader = (string | { name: string; textAlign: 'left' | 'right' | 'center' })[]
-// type TBody = (string | ((item: Column) => string))[]
-type TBody = (string)[]
-
-const defaultHeader = ['参数', '说明', '类型', '是否必填', '可选值', '默认值']
-
-const defaultBody = ['name', 'comments.description', 'type', 'required', 'comments.options', 'comments.default']
-
-function genTHeader(header: THeader) {
+function genTHeader(header: ColumnsType[]) {
   return `  <thead>
     <tr>
-      ${header.map(item => `<th style="white-space: nowrap">${item}</th>`).join('\n      ')}
+      ${header.map(({ title, align = 'left' }) =>
+    `<th style="white-space: nowrap;text-align:${align}">
+    ${title}
+    </th>`)
+      .join('\n      ')
+    }
     </tr>
   </thead>`
 }
-// @ts-expect-error TODO
-function genTBody(members, body: TBody) {
+
+function genTBody(body: ColumnsType[], data: InterfaceDefinition[]) {
   return `  <tbody>
-    ${members.map((item: InterfaceDefinition) => {
+    ${data.map((item) => {
     return `<tr>
-      ${body.map(b => `<td style="white-space: nowrap">${get(item, b)}</td>`).join('\n      ')}
+      ${body.map(({ dataKey, align = 'left' }) => `<td style="white-space: nowrap;text-align:${align}">
+      ${isString(dataKey) ? get(item, dataKey, '') : dataKey(item)}</td>`)
+        .join('\n      ')}
     </tr>`
   }).join('\n   ')}
   </tbody>
@@ -61,55 +90,85 @@ function genTFooter() {
   return null
 }
 
-function genTable(title: string, header: THeader, body: TBody, item: any) {
+// TODO: 合并header和body的渲染
+export function genTable(
+  title: string,
+  config: {
+    title?: string
+    columns: ColumnsType[]
+  },
+  data: InterfaceDefinition[],
+) {
   return `
-<h2>${title}</h2>
+<h2>${config.title || title}</h2>
 <table>
-${genTHeader(header)}
-${genTBody(item, body)}
+${genTHeader(config.columns)}
+${genTBody(config.columns, data)}
 </table>
 `
 }
-export function props2table(config?: Record<string | 'default', Config> | Config): Plugin {
+
+export interface ColumnsType {
+  /**
+   * header 显示标题
+   */
+  title: string
+  /**
+   * 表格对齐方式
+   */
+  align?: 'left' | 'right' | 'center'
+  /**
+   * 表格数据对应的key字段
+   */
+  dataKey: string | ((data: InterfaceDefinition) => string)
+}
+export interface PluginConfig {
+  [key: 'default' | string]: {
+    title?: string
+    columns: ColumnsType[]
+  }
+}
+const defaultConfig = {
+  default: {
+    columns: [
+      {
+        title: '参数',
+        dataKey: 'name'
+      },
+      {
+        title: '说明',
+        dataKey: 'comments.description'
+      },
+      {
+        title: '类型',
+        dataKey: 'type'
+      },
+      {
+        title: '是否必填',
+        dataKey: 'required'
+      },
+      {
+        title: '可选值',
+        dataKey: 'comments.options'
+      },
+      {
+        title: '默认值',
+        dataKey: 'comments.default'
+      }
+    ]
+  }
+}
+export function props2table(
+  config: PluginConfig = {}
+): Plugin {
+
   return {
     enforce: 'pre',
     name: 'props2table',
     transform(code, id) {
       if (id.endsWith('.md')) {
-
-        const matches = matchReg(code)
-        const hmrPaths = []
-        if (matches) {
-          for (const match of matches) {
-            const [filePath, params] = getParams(match[0])
-
-
-            const { key, header, body, title: customTitle } = params
-
-            const p = join(__dirname, filePath.trim())
-            try {
-              const data = parseInterface(fs.readFileSync(p, 'utf-8'))
-              hmrPaths.push(filePath.trim())
-              const table = (key ? [key] : Object.keys(data))
-                .map(title => genTable(customTitle || title, header || defaultHeader, body || defaultBody, data[title]))
-                .join('')
-
-              code = code.replace(match[0], table)
-            }
-            catch (error) {
-
-            }
-          }
-
-          // `| Tables        | Are           | Cool  |
-          // | ------------- |:-------------:| -----:|
-          // | col 3 is      | right-aligned | $1600 |
-          // | col 2 is      | centered      |   $12 |
-          // | zebra stripes | are neat      |    $1 |`
-
-          return {
-            code: code + hmrCode(hmrPaths),
-          }
+        return {
+          code: replaceCode2table(code, merge(defaultConfig, config)),
         }
       }
     },

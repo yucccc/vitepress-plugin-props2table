@@ -22,8 +22,7 @@ export interface PropsAllType {
   c: Props2
   /**
    * @description 描述e 是一个数组
+   * @version 1.0.0
    */
   e: string[]
-
-
 }

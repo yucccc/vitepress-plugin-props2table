@@ -1,7 +1,7 @@
 {
   "name": "vitepress-plugin-props2table",
   "type": "module",
-  "version": "0.0.5",
+  "version": "0.0.6",
   "private": false,
   "description": "",
   "author": "yucccc",
