@@ -47,7 +47,7 @@ export default defineConfig({
 
 
 ```markdown
-@props2table(./path.ts)
+@props2table(./path.ts, 'myid1')
 ```
 
 2、然后在``vite.config.js``中配置
@@ -101,3 +101,29 @@ export default defineConfig({
 ```
 
 @props2table(../src/parseInterface.ts, 'c-interface', 'InterfaceDefinition')
+
+
+## 高级
+
+### 自定义解析器
+> 目前默认只解析typescript文件   
+> 有些情况下 你可能需要解析tsx 或者其他文件（前提是babel支持）    
+> 你可以传入第二个参数 使其支持解析其他文件类型  
+
+```typescript
+ props2table({}, ['jsx'])
+```
+
+
+
+
+### 获取解析结果
+> 有些情况下 你可能不想要解析为表格 或者你想在其他地方使用解析结果  
+> 你可以直接使用 parseInterface 解析返回即可   
+> 🐷: 可在任意地方使用 不再是通过插件的方式在 ``vite.config.ts`` 中使用  
+
+
+```typescript
+import { parseInterface } from 'vitepress-plugin-props2table'
+parseInterface('you code')
+```

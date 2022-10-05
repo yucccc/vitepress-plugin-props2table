@@ -4,6 +4,7 @@ import getCallerFile from 'get-caller-file';
 import type { Plugin } from 'vite'
 import fs from 'node:fs'
 import { parseInterface } from './parseInterface'
+import { ParserPlugin } from '@babel/parser'
 import get from 'lodash.get'
 import merge from 'lodash.merge'
 import isString from 'lodash.isstring'
@@ -30,7 +31,8 @@ function getCodeIndex(code: string) {
 }
 export function replaceCode2table(
   code: string,
-  replaceConfig: PluginConfig
+  replaceConfig: PluginConfig,
+  parsePlugins?: ParserPlugin[]
 ) {
   const demoScope = getCodeIndex(code)
   const hmrPaths: string[] = []
@@ -50,7 +52,7 @@ export function replaceCode2table(
 
     const path = resolve(dir.replace('file://', ''), '..', filePath)
 
-    const tableData = parseInterface(fs.readFileSync(path, 'utf-8'))
+    const tableData = parseInterface(fs.readFileSync(path, 'utf-8'), parsePlugins)
 
     const config = replaceConfig[id]
 
@@ -171,7 +173,8 @@ const defaultConfig = {
 }
 let dir: string = ''
 export function props2table(
-  config: PluginConfig = {}
+  config: PluginConfig = {},
+  parsePlugins?: ParserPlugin[]
 ): Plugin {
   dir = getCallerFile()
 
@@ -182,7 +185,7 @@ export function props2table(
     transform(code, id) {
       if (id.endsWith('.md')) {
         return {
-          code: replaceCode2table(code, merge(defaultConfig, config)),
+          code: replaceCode2table(code, merge(defaultConfig, config), parsePlugins),
         }
       }
     },

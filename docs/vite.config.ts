@@ -49,6 +49,7 @@ export default defineConfig({
           {
             title: '是否必填',
             dataKey: (data) => data.required ? '是' : '否',
+            align: 'center'
           },
         ],
       }

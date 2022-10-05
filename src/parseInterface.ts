@@ -9,7 +9,7 @@ const defaultParserPlugin: ParserPlugin[] = ["typescript"]
 export function parseCode(code: string, plugins: ParserPlugin[] = []): ParseResult<any> {
     return parse(code, {
         sourceType: "module",
-        plugins: defaultParserPlugin.concat(plugins),
+        plugins: plugins,
     });
 }
 
@@ -160,8 +160,17 @@ function parseInterfaceDefinitions(nodePaths: any): any[] {
 type CommentType = 'description' | 'default' | 'options'
 
 export interface InterfaceDefinition {
+    /**
+     * 属性名
+     */
     name: string;
+    /**
+     * 属性类型
+     */
     type: string;
+    /**
+     * 是否必填
+     */
     required: boolean;
     /**
      * 所有注释都将解析到这里
@@ -169,9 +178,9 @@ export interface InterfaceDefinition {
     comments: Record<CommentType | string, string>
 }
 
-export function parseInterface(code: string, parsePlugins?: ParserPlugin[]): Record<string, InterfaceDefinition[]> {
+export function parseInterface(code: string, parsePlugins: ParserPlugin[] = []): Record<string, InterfaceDefinition[]> {
 
-    const ast = parseCode(code, parsePlugins);
+    const ast = parseCode(code, defaultParserPlugin.concat(parsePlugins));
 
     const interfaces = findInterfaces(ast);
 
