@@ -207,7 +207,7 @@ test('parse array', () => {
 
 })
 
-test.only('parse Record', () => {
+test('parse Record', () => {
   const res = parseInterface(`
     export interface PPP {
       a: Record<string, any>

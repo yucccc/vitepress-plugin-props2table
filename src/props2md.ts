@@ -29,6 +29,7 @@ function getCodeIndex(code: string) {
   }
   return []
 }
+
 export function replaceCode2table(
   code: string,
   replaceConfig: PluginConfig,
@@ -36,6 +37,7 @@ export function replaceCode2table(
 ) {
   const demoScope = getCodeIndex(code)
   const hmrPaths: string[] = []
+  dir = dir || getCallerFile()
   const c2t = code.replaceAll(matchReg, (substring, params: string, index: number) => {
 
     // demo内不进行替换
@@ -51,10 +53,22 @@ export function replaceCode2table(
     interfaceName = normalizeParam(interfaceName)
 
     const path = resolve(dir.replace('file://', ''), '..', filePath)
+    let fileContent = null
+    try {
+      fileContent = fs.readFileSync(path, 'utf-8')
+    } catch (error) {
+      console.error('path not found');
+      return substring
+    }
 
-    const tableData = parseInterface(fs.readFileSync(path, 'utf-8'), parsePlugins)
+    const tableData = parseInterface(fileContent, parsePlugins)
 
     const config = replaceConfig[id]
+
+    if (!config) {
+      console.warn('not found config', id)
+      return substring
+    }
 
     hmrPaths.push(filePath)
     return (interfaceName ? [interfaceName] : Object.keys(tableData)).map(title => {
@@ -62,7 +76,10 @@ export function replaceCode2table(
     }).join('')
 
   })
-  return c2t + hmrCode(hmrPaths)
+  return {
+    code: c2t,
+    importPath: hmrPaths
+  }
 }
 
 function normalizeParam(str: string) {
@@ -73,29 +90,22 @@ function normalizeParam(str: string) {
 }
 
 function genTHeader(header: ColumnsType[]) {
-  return `  <thead>
-    <tr>
-      ${header.map(({ title, align = 'left' }) =>
-    `<th style="white-space: nowrap;text-align:${align}">
-    ${title}
-    </th>`)
-      .join('\n      ')
-    }
-    </tr>
-  </thead>`
+  return `<thead>
+<tr>
+${header.map(({ title, align = 'left' }) => `<th style="white-space: nowrap;text-align:${align}">${title}</th>`).join('\n')}
+</tr>
+</thead>`
 }
 
 function genTBody(body: ColumnsType[], data: InterfaceDefinition[]) {
-  return `  <tbody>
-    ${data.map((item) => {
+  return `<tbody>
+${data.map((item) => {
     return `<tr>
-      ${body.map(({ dataKey, align = 'left' }) => `<td style="white-space: nowrap;text-align:${align}">
-      ${isString(dataKey) ? encodeHtml(get(item, dataKey, '')) : dataKey(item)}</td>`)
-        .join('\n      ')}
-    </tr>`
-  }).join('\n   ')}
-  </tbody>
-  `
+${body.map(({ dataKey, align = 'left' }) => `<td style="white-space: nowrap;text-align:${align}">${isString(dataKey) ? encodeHtml(get(item, dataKey, '')) : dataKey(item)}</td>`)
+        .join('\n')}
+</tr>`
+  }).join('\n')}
+</tbody>`
 }
 
 // TODO: footer
@@ -114,11 +124,10 @@ export function genTable(
 ) {
   return `
 <h2>${config.title || title}</h2>
-<table>
+<table> 
 ${genTHeader(config.columns)}
 ${genTBody(config.columns, data)}
-</table>
-`
+</table>`
 }
 
 export interface ColumnsType {
@@ -177,22 +186,21 @@ export function props2table(
   parsePlugins?: ParserPlugin[]
 ): Plugin {
   dir = getCallerFile()
-
-
   return {
     enforce: 'pre',
     name: 'props2table',
     transform(code, id) {
       if (id.endsWith('.md')) {
+        const { importPath, code: tableCode } = replaceCode2table(code, merge(defaultConfig, config), parsePlugins)
         return {
-          code: replaceCode2table(code, merge(defaultConfig, config), parsePlugins),
+          code: tableCode + hmrCode(importPath),
         }
       }
     },
   }
 }
 
-function hmrCode(paths: string[]) {
+export function hmrCode(paths: string[]) {
   return `
 <script setup>
   const hmrFiles = import.meta.glob(${JSON.stringify(paths)}, {  eager: true })

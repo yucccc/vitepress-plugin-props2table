@@ -50,36 +50,50 @@ test('match reg', () => {
 
 })
 
-test('只替换demo外的', () => {
-    // const code = `
-    //     \`\`\`markdown
-    //     @props2table(path)
-    //     \`\`\`
+test('replaceCode2table', () => {
+    const code = `@props2table(./props-all.ts, id)`
+    const { code: tableCode, importPath } = replaceCode2table(code, {
+        'id': {
+            title: 'id',
+            columns: [{ 'dataKey': 'name', 'title': '名称' }]
+        }
+    })
+    expect(tableCode).toBe(`
+<h2>id</h2>
+<table> 
+<thead>
+<tr>
+<th style="white-space: nowrap;text-align:left">名称</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="white-space: nowrap;text-align:left">a</td>
+</tr>
+<tr>
+<td style="white-space: nowrap;text-align:left">b</td>
+</tr>
+<tr>
+<td style="white-space: nowrap;text-align:left">c</td>
+</tr>
+<tr>
+<td style="white-space: nowrap;text-align:left">e</td>
+</tr>
+<tr>
+<td style="white-space: nowrap;text-align:left">f</td>
+</tr>
+</tbody>
+</table>`)
 
-    //     \`\`\`markdown
-    //     @props2table(path2)
-    //     \`\`\`
+    expect(importPath).toEqual(['./props-all.ts'])
 
-    //     @props2table(path3, id) 
-    // `
-    // const match = [...code.matchAll(matchReg)]
-
-    // const b = replaceCode2table(code, {})
-
-    // expect(b).toBe(`
-    //     \`\`\`markdown
-    //     @props2table(path)
-    //     \`\`\`
-
-    //     \`\`\`markdown
-    //     @props2table(path2)
-    //     \`\`\`
-
-    //     table 
-    // `)
-
-    // expect(match[0][0]).toBe('@props2table(path)')
-
-
+    const code2 = `@props2table(./non existent path.ts, id)`
+    const rcode = replaceCode2table(code2, {
+        'id': {
+            title: 'id',
+            columns: [{ 'dataKey': 'name', 'title': '名称' }]
+        }
+    })
+    expect(rcode.code).toBe(code2)
+    expect(rcode.importPath).toEqual([])
 })
-
