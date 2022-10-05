@@ -11,7 +11,6 @@ specifiers:
   '@vitest/coverage-c8': ^0.23.4
   '@vitest/coverage-istanbul': ^0.23.4
   ast-types: ^0.14.2
-  caller-path: ^4.0.0
   get-caller-file: ^2.0.5
   lodash: ^4.17.21
   lodash-es: ^4.17.21
@@ -27,11 +26,7 @@ specifiers:
 
 dependencies:
   '@babel/parser': 7.19.3
-  '@types/lodash': 4.14.186
-  '@types/lodash.get': 4.4.7
-  '@types/lodash.isstring': 4.0.7
   ast-types: 0.14.2
-  caller-path: 4.0.0
   get-caller-file: 2.0.5
   lodash: 4.17.21
   lodash-es: 4.17.21
@@ -43,7 +38,10 @@ dependencies:
   vue: 3.2.39
 
 devDependencies:
+  '@types/lodash': 4.14.186
   '@types/lodash-es': 4.17.6
+  '@types/lodash.get': 4.4.7
+  '@types/lodash.isstring': 4.0.7
   '@types/lodash.merge': 4.6.7
   '@types/node': 18.7.18
   '@vitest/coverage-c8': 0.23.4
@@ -597,13 +595,13 @@ packages:
     resolution: {integrity: sha512-af34Mj+KdDeuzsJBxc/XeTtOx0SZHZNLd+hdrn+PcKGQs0EG2TJTzQAOTCZTgDJCArahlCzLWSy8c2w59JRz7Q==}
     dependencies:
       '@types/lodash': 4.14.186
-    dev: false
+    dev: true
 
   /@types/lodash.isstring/4.0.7:
     resolution: {integrity: sha512-gt4q4n1Who4JxLeFR/kduS2Tia+biQk/zdbIkOfMvAldXHJdcC5SsvZREchkwa4CwKK+DqhIm3wfigFYzNKS8Q==}
     dependencies:
       '@types/lodash': 4.14.186
-    dev: false
+    dev: true
 
   /@types/lodash.merge/4.6.7:
     resolution: {integrity: sha512-OwxUJ9E50gw3LnAefSHJPHaBLGEKmQBQ7CZe/xflHkyy/wH2zVyEIAKReHvVrrn7zKdF58p16We9kMfh7v0RRQ==}
@@ -613,6 +611,7 @@ packages:
 
   /@types/lodash/4.14.186:
     resolution: {integrity: sha512-eHcVlLXP0c2FlMPm56ITode2AgLMSa6aJ05JTTbYbI+7EMkCEE5qk2E41d5g2lCVTqRe0GnnRFurmlCsDODrPw==}
+    dev: true
 
   /@types/node/18.7.18:
     resolution: {integrity: sha512-m+6nTEOadJZuTPkKR/SYK3A2d7FZrgElol9UP1Kae90VVU4a6mxnPuLiIW1m4Cq4gZ/nWb9GrdVXJCoCazDAbg==}
@@ -902,25 +901,6 @@ packages:
       yargs: 16.2.0
       yargs-parser: 20.2.9
     dev: true
-
-  /caller-callsite/5.0.0:
-    resolution: {integrity: sha512-l3+xZHsuNlFjchy1nl1kpQwi7PhKHgtQ7MOx5ijHwlouAjnwRNjq3AlxH8SGuWiF5XAhb/mSH+c90LIDFjJKtA==}
-    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
-    dependencies:
-      callsites: 4.0.0
-    dev: false
-
-  /caller-path/4.0.0:
-    resolution: {integrity: sha512-18JFq7TTe4+cDKsyZETRk/IS9Xka3dRcU9VWm1C6XlkAjKPSR2bskpDSUHVQw7gvef34bi1gltzmCxToUw1oQw==}
-    engines: {node: ^12.20.0 || ^14.13.1 || >=16.0.0}
-    dependencies:
-      caller-callsite: 5.0.0
-    dev: false
-
-  /callsites/4.0.0:
-    resolution: {integrity: sha512-y3jRROutgpKdz5vzEhWM34TidDU8vkJppF8dszITeb1PQmSqV3DTxyV8G/lyO/DNvtE1YTedehmw9MPZsCBHxQ==}
-    engines: {node: '>=12.20'}
-    dev: false
 
   /caniuse-lite/1.0.30001412:
     resolution: {integrity: sha512-+TeEIee1gS5bYOiuf+PS/kp2mrXic37Hl66VY6EAfxasIk5fELTktK2oOezYed12H8w7jt3s512PpulQidPjwA==}
