@@ -25,4 +25,5 @@ export interface PropsAllType {
    * @version 1.0.0
    */
   e: string[]
+  f: Record<string, string>
 }

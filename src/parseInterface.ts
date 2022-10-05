@@ -1,7 +1,8 @@
 import { parse } from '@babel/parser'
 import type { ParserPlugin, ParseResult } from '@babel/parser'
 import { visit, ASTNode } from 'ast-types'
-import { get, isArray } from 'lodash-es'
+import get from 'lodash.get'
+import isArray from 'lodash.isarray'
 
 const defaultParserPlugin: ParserPlugin[] = ["typescript"]
 
@@ -25,17 +26,6 @@ function findInterfaces(node: ASTNode) {
     });
     return ret;
 }
-
-// function parseTSTypeReference(typeName) {
-//     const type = get(typeName, "type");
-
-//     switch (type) {
-//         case "TSQualifiedName":
-//             return `${get(typeName, "left.name")}.${get(typeName, "right.name")}`;
-//         default:
-//             return `Unknown ReferenceType`;
-//     }
-// }
 
 function parseTSFunctionType(parameters: any[], typeAnnotation: any) {
     const parseTSFunctionParameters = (parameters: any[]) => {
@@ -173,6 +163,9 @@ export interface InterfaceDefinition {
     name: string;
     type: string;
     required: boolean;
+    /**
+     * 所有注释都将解析到这里
+     */
     comments: Record<CommentType | string, string>
 }
 

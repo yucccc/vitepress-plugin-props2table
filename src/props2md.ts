@@ -9,6 +9,14 @@ import merge from 'lodash.merge'
 import isString from 'lodash.isstring'
 import type { InterfaceDefinition } from './parseInterface'
 
+// 把< > 转码
+function encodeHtml(str: string) {
+  if (isString(str)) {
+    return str.replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  }
+  return str
+}
+
 export const matchReg = /@props2table\((.+)\)/g
 
 // demo内的应该被忽略
@@ -80,7 +88,7 @@ function genTBody(body: ColumnsType[], data: InterfaceDefinition[]) {
     ${data.map((item) => {
     return `<tr>
       ${body.map(({ dataKey, align = 'left' }) => `<td style="white-space: nowrap;text-align:${align}">
-      ${isString(dataKey) ? get(item, dataKey, '') : dataKey(item)}</td>`)
+      ${isString(dataKey) ? encodeHtml(get(item, dataKey, '')) : dataKey(item)}</td>`)
         .join('\n      ')}
     </tr>`
   }).join('\n   ')}

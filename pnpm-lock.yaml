@@ -5,6 +5,7 @@ specifiers:
   '@types/lodash': ^4.14.186
   '@types/lodash-es': ^4.17.6
   '@types/lodash.get': ^4.4.7
+  '@types/lodash.isarray': ^4.0.7
   '@types/lodash.isstring': ^4.0.7
   '@types/lodash.merge': ^4.6.7
   '@types/node': ^18.7.18
@@ -12,9 +13,8 @@ specifiers:
   '@vitest/coverage-istanbul': ^0.23.4
   ast-types: ^0.14.2
   get-caller-file: ^2.0.5
-  lodash: ^4.17.21
-  lodash-es: ^4.17.21
   lodash.get: ^4.4.2
+  lodash.isarray: ^4.0.0
   lodash.isstring: ^4.0.1
   lodash.merge: ^4.6.2
   unbuild: ^0.8.11
@@ -28,9 +28,8 @@ dependencies:
   '@babel/parser': 7.19.3
   ast-types: 0.14.2
   get-caller-file: 2.0.5
-  lodash: 4.17.21
-  lodash-es: 4.17.21
   lodash.get: 4.4.2
+  lodash.isarray: 4.0.0
   lodash.isstring: 4.0.1
   lodash.merge: 4.6.2
   unbuild: 0.8.11
@@ -41,6 +40,7 @@ devDependencies:
   '@types/lodash': 4.14.186
   '@types/lodash-es': 4.17.6
   '@types/lodash.get': 4.4.7
+  '@types/lodash.isarray': 4.0.7
   '@types/lodash.isstring': 4.0.7
   '@types/lodash.merge': 4.6.7
   '@types/node': 18.7.18
@@ -593,6 +593,12 @@ packages:
 
   /@types/lodash.get/4.4.7:
     resolution: {integrity: sha512-af34Mj+KdDeuzsJBxc/XeTtOx0SZHZNLd+hdrn+PcKGQs0EG2TJTzQAOTCZTgDJCArahlCzLWSy8c2w59JRz7Q==}
+    dependencies:
+      '@types/lodash': 4.14.186
+    dev: true
+
+  /@types/lodash.isarray/4.0.7:
+    resolution: {integrity: sha512-j4LGkaWRU3siKODqnY9xffwoJgnpp4TYsfCxDhRSZwIbX4qD+TkH483r6+mqGkgqlnP08NhjQYhDXPLWgA2uxQ==}
     dependencies:
       '@types/lodash': 4.14.186
     dev: true
@@ -1750,12 +1756,13 @@ packages:
       p-locate: 5.0.0
     dev: true
 
-  /lodash-es/4.17.21:
-    resolution: {integrity: sha512-mKnC+QJ9pWVzv+C4/U3rRsHapFfHvQFoFB92e52xeyGMcX6/OlIl78je1u8vePzYZSkkogMPJ2yjxxsb89cxyw==}
-    dev: false
-
   /lodash.get/4.4.2:
     resolution: {integrity: sha512-z+Uw/vLuy6gQe8cfaFWD7p0wVv8fJl3mbzXh33RS+0oW2wvUqiRXiQ69gLWSLpgB5/6sU+r6BlQR0MBILadqTQ==}
+    dev: false
+
+  /lodash.isarray/4.0.0:
+    resolution: {integrity: sha512-V8ViWvoNlXpCrB6Ewaj3ScRXUpmCvqp4tJUxa3dlovuJj/8lp3SND5Kw4v5OeuHgoyw4qJN+gl36qZqp6WYQ6g==}
+    deprecated: This package is deprecated. Use Array.isArray.
     dev: false
 
   /lodash.isstring/4.0.1:
@@ -1764,10 +1771,6 @@ packages:
 
   /lodash.merge/4.6.2:
     resolution: {integrity: sha512-0KpjqXRVvrYyCsX1swR/XTK0va6VQkQM6MNo7PqW77ByjAhoARA8EfrP1N4+KlKj8YS0ZUCtRT/YUuhyYDujIQ==}
-    dev: false
-
-  /lodash/4.17.21:
-    resolution: {integrity: sha512-v2kDEe57lecTulaDIuNTPy3Ry4gLGJ6Z1O3vE1krgXZNrsQ+LFTGHVxVjcXPs17LhbZVGedAJv8XZ1tvj5FvSg==}
     dev: false
 
   /loupe/2.3.4:

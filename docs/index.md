@@ -97,7 +97,7 @@ export default defineConfig({
 
 ```markdown
 <!-- 只解析./path.ts文件下 interface Props 的返回 -->
-@props2table(./path.ts, 'default', 'Emits')
+@props2table(./path.ts, 'c-interface', 'InterfaceDefinition')
 ```
 
-@props2table(../test/props.ts, default, 'Emits')
+@props2table(../src/parseInterface.ts, 'c-interface', 'InterfaceDefinition')

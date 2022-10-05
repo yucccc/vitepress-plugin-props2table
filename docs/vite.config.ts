@@ -30,6 +30,27 @@ export default defineConfig({
             },
           },
         ],
+      },
+      'c-interface': {
+        title: 'parse interface types',
+        columns: [
+          {
+            title: 'name',
+            dataKey: 'name',
+          },
+          {
+            title: '描述',
+            dataKey: 'comments.description',
+          },
+          {
+            title: '类型',
+            dataKey: 'type',
+          },
+          {
+            title: '是否必填',
+            dataKey: (data) => data.required ? '是' : '否',
+          },
+        ],
       }
     }),
     Inspect(),

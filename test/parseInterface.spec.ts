@@ -207,6 +207,24 @@ test('parse array', () => {
 
 })
 
+test.only('parse Record', () => {
+  const res = parseInterface(`
+    export interface PPP {
+      a: Record<string, any>
+      b: Record<string, string>
+      c: Record<string, string | number>
+    }
+  `)
+
+  expect(res).toEqual({
+    "PPP": [
+      { required: true, comments: {}, "name": "a", "type": "Record<string, any>" },
+      { required: true, comments: {}, "name": "b", "type": "Record<string, string>" },
+      { required: true, comments: {}, "name": "c", "type": "Record<string, string | number>" },
+    ]
+  })
+
+})
 test('parse function ', () => {
 
   const res = parseInterface(`

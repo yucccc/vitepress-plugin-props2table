@@ -1,4 +1,4 @@
-<h1 align="center"> vitepress-plugin-props2table <sup>𝚊𝚕𝚙𝚑𝚊</sup></h1>
+<h1 align="center"> vitepress-plugin-props2table </h1>
 
 <p align="center" >
 <a  href="https://www.npmjs.com/package/vitepress-plugin-props2table" > 
