@@ -12,8 +12,6 @@ pnpm i vitepress-plugin-props2table
 1、add plugin in `vite.config.js`
 
 ```typescript
-// vite.config.ts
-
 import { props2table } from 'vitepress-plugin-props2table'
 
 export default defineConfig({
