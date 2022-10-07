@@ -32,7 +32,7 @@ export default defineConfig({
         ],
       },
       'c-interface': {
-        title: 'parse interface types',
+        title: 'ParseInterfaceTypes',
         columns: [
           {
             title: 'name',

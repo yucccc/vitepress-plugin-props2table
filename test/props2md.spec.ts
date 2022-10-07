@@ -59,7 +59,7 @@ test('replaceCode2table', () => {
         }
     })
     expect(tableCode).toBe(`
-<h2>id</h2>
+## id
 <table> 
 <thead>
 <tr>

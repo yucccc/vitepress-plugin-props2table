@@ -1,7 +1,7 @@
 {
   "name": "vitepress-plugin-props2table",
   "type": "module",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "description": "",
   "author": "yucccc",
@@ -14,7 +14,9 @@
   "keywords": [
     "vitepress",
     "markdown",
-    "propsToTable"
+    "props to table",
+    "parser interface",
+    "parser props"
   ],
   "exports": {
     ".": {

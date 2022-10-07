@@ -122,8 +122,9 @@ export function genTable(
   },
   data: InterfaceDefinition[],
 ) {
+  const _title = config.title || title
   return `
-<h2>${config.title || title}</h2>
+## ${_title}
 <table> 
 ${genTHeader(config.columns)}
 ${genTBody(config.columns, data)}
