@@ -47,9 +47,21 @@ export default defineConfig({
 
 3、and you will see a table
 
-<h2>PropsAllType</h2>
+<h2>Output table demo</h2>
 <table><thead><tr><th style="white-space:nowrap;text-align:left;">参数</th><th style="white-space:nowrap;text-align:left;">说明</th><th style="white-space:nowrap;text-align:left;">类型</th><th style="white-space:nowrap;text-align:left;">是否必填</th><th style="white-space:nowrap;text-align:left;">可选值</th><th style="white-space:nowrap;text-align:left;">默认值</th></tr></thead><tbody><tr><td style="white-space:nowrap;text-align:left;">a</td><td style="white-space:nowrap;text-align:left;">描述a</td><td style="white-space:nowrap;text-align:left;">string</td><td style="white-space:nowrap;text-align:left;">true</td><td style="white-space:nowrap;text-align:left;"></td><td style="white-space:nowrap;text-align:left;">默认值是1</td></tr><tr><td style="white-space:nowrap;text-align:left;">b</td><td style="white-space:nowrap;text-align:left;">描述b 是一个枚举值</td><td style="white-space:nowrap;text-align:left;">a | b | c</td><td style="white-space:nowrap;text-align:left;">true</td><td style="white-space:nowrap;text-align:left;"></td><td style="white-space:nowrap;text-align:left;">默认值是a</td></tr><tr><td style="white-space:nowrap;text-align:left;">c</td><td style="white-space:nowrap;text-align:left;">描述c是一个外部引用的类型</td><td style="white-space:nowrap;text-align:left;">Props2</td><td style="white-space:nowrap;text-align:left;">true</td><td style="white-space:nowrap;text-align:left;"></td><td style="white-space:nowrap;text-align:left;"></td></tr><tr><td style="white-space:nowrap;text-align:left;">e</td><td style="white-space:nowrap;text-align:left;">描述e 是一个数组</td><td style="white-space:nowrap;text-align:left;">string[]</td><td style="white-space:nowrap;text-align:left;">true</td><td style="white-space:nowrap;text-align:left;"></td><td style="white-space:nowrap;text-align:left;"></td></tr><tr><td style="white-space:nowrap;text-align:left;">f</td><td style="white-space:nowrap;text-align:left;"></td><td style="white-space:nowrap;text-align:left;">Record&lt;string, string&gt;</td><td style="white-space:nowrap;text-align:left;">true</td><td style="white-space:nowrap;text-align:left;"></td><td style="white-space:nowrap;text-align:left;"></td></tr></tbody></table>
 
-## docs
+## Get Parse Interface
+
+> If you don't want to render it as a table and want to get the parsing results  
+> you can directly use the `parseInterface` method.
+
+```typescript
+import { parseInterface } from 'vitepress-plugin-props2table'
+parseInterface('you code') // return JSON => ParseInterfaceTypes
+```
+
+[ParseInterfaceTypes](http://yucccc.com/vitepress-plugin-props2table/#parseinterfacetypes)
+
+## doc
 
 http://yucccc.com/vitepress-plugin-props2table/
