@@ -15,6 +15,15 @@
 
 <p align="center">Parsing interface Show as a table.</p>
 
+## why?
+
+Writing component documents makes the work cumbersome.   
+Using this plug-in, you can directly import parameter files to parse the table format you want.
+
+<details>
+  <summary>中文</summary>
+  编写组件文档让工作变得繁琐，使用该插件可以直接导入参数文件，从而解析为你想要的表格格式
+</details>
 
 
 ## install
