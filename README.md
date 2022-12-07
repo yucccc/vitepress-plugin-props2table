@@ -49,8 +49,8 @@ export default defineConfig({
 2、add command in markdown
 
 ```markdown
-<!-- ./path.ts is you file path -->
-@props2table(./path.ts)
+<!-- /path.ts is you file path -->
+@props2table(/path.ts)
 ```
 
 
