@@ -26,23 +26,19 @@ export default defineConfig({
 2、add command in markdown
 
 ```markdown
-<!-- ./path.ts is you file path -->
-@props2table(./path.ts)
+<!-- /path.ts is you file path -->
+@props2table(/path.ts)
 ```
-
+📢: Path can only be an absolute path
 
 3、and you will see a table
 
-@props2table(../test/props-all.ts)
+@props2table(/test/props-all.ts)
 
 ## 自定义表格
 
 1、 需要增加一个id以对应配置的id id可以是任意值
 > 🐷: id不填为``default`` 如果想要多个表格使用同一个配置，id相同即可 或者重写default配置
-
-
-
-
 
 ```markdown
 @props2table(./path.ts, 'myid1')
@@ -86,7 +82,7 @@ export default defineConfig({
 ```
 
 3、最后你会看到一个自定义的表格
-@props2table(../test/props-all.ts, "myid1")
+@props2table(/test/props-all.ts, "myid1")
 
 
 ## 只解析某个返回
@@ -98,7 +94,7 @@ export default defineConfig({
 @props2table(./path.ts, 'c-interface', 'InterfaceDefinition')
 ```
 
-@props2table(../src/parseInterface.ts, 'c-interface', 'InterfaceDefinition')
+@props2table(/src/parseInterface.ts, 'c-interface', 'InterfaceDefinition')
 
 
 ## 高级

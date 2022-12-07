@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite'
 import Inspect from 'vite-plugin-inspect'
 
-import { props2table } from '../src/index'
+import { props2table } from '../src'
 
 export default defineConfig({
   server: {

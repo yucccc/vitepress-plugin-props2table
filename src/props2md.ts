@@ -1,6 +1,5 @@
 // 将ts转换为table
-import { resolve } from 'node:path'
-import getCallerFile from 'get-caller-file';
+import { resolve, join } from 'node:path'
 import type { Plugin } from 'vite'
 import fs from 'node:fs'
 import { parseInterface } from './parseInterface'
@@ -9,7 +8,7 @@ import get from 'lodash.get'
 import merge from 'lodash.merge'
 import isString from 'lodash.isstring'
 import type { InterfaceDefinition } from './parseInterface'
-
+const PLUGIN_NAME = 'props2table'
 // 把< > 转码
 function encodeHtml(str: string) {
   if (isString(str)) {
@@ -37,7 +36,6 @@ export function replaceCode2table(
 ) {
   const demoScope = getCodeIndex(code)
   const hmrPaths: string[] = []
-  dir = dir || getCallerFile()
   const c2t = code.replaceAll(matchReg, (substring, params: string, index: number) => {
 
     // demo内不进行替换
@@ -52,7 +50,10 @@ export function replaceCode2table(
     id = normalizeParam(id)
     interfaceName = normalizeParam(interfaceName)
 
-    const path = resolve(dir.replace('file://', ''), '..', filePath)
+    const path = join(process.cwd(), filePath)
+    if (!path) {
+      console.error(`pluin ${PLUGIN_NAME} path no found:`, path)
+    }
     let fileContent = null
     try {
       fileContent = fs.readFileSync(path, 'utf-8')
@@ -124,11 +125,14 @@ export function genTable(
 ) {
   const _title = config.title || title
   return `
-## ${_title}
+## ${_title}  
+
 <table> 
 ${genTHeader(config.columns)}
 ${genTBody(config.columns, data)}
-</table>`
+</table>
+
+`
 }
 
 export interface ColumnsType {
@@ -181,15 +185,13 @@ const defaultConfig = {
     ]
   }
 }
-let dir: string = ''
 export function props2table(
   config: PluginConfig = {},
   parsePlugins?: ParserPlugin[]
 ): Plugin {
-  dir = getCallerFile()
   return {
     enforce: 'pre',
-    name: 'props2table',
+    name: PLUGIN_NAME,
     transform(code, id) {
       if (id.endsWith('.md')) {
         const { importPath, code: tableCode } = replaceCode2table(code, merge(defaultConfig, config), parsePlugins)

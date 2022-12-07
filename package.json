@@ -6,6 +6,16 @@
   "description": "",
   "author": "yucccc",
   "license": "ISC",
+  "scripts": {
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:serve": "vitepress serve docs",
+    "prepublishOnly": "npm run build",
+    "test": "vitest --watch",
+    "dev": "unbuild --stub",
+    "build": "unbuild",
+    "coverage": "vitest run --coverage"
+  },
   "repository": {
     "type": "git",
     "url": "git+https://github.com/yucccc/vitepress-plugin-props2table.git",
@@ -34,20 +44,9 @@
   "engines": {
     "node": "^14.18.0 || >=16.0.0"
   },
-  "scripts": {
-    "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs",
-    "docs:serve": "vitepress serve docs",
-    "prepublishOnly": "npm run build",
-    "test": "vitest --watch",
-    "dev": "unbuild --stub",
-    "build": "unbuild",
-    "coverage": "vitest run --coverage"
-  },
   "dependencies": {
     "@babel/parser": "^7.19.3",
     "ast-types": "^0.14.2",
-    "get-caller-file": "^2.0.5",
     "lodash.get": "^4.4.2",
     "lodash.isarray": "^4.0.0",
     "lodash.isstring": "^4.0.1",
