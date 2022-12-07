@@ -51,7 +51,7 @@ test('match reg', () => {
 })
 
 test('replaceCode2table', () => {
-    const code = `@props2table(./props-all.ts, id)`
+    const code = `@props2table(/test/props-all.ts, id)`
     const { code: tableCode, importPath } = replaceCode2table(code, {
         'id': {
             title: 'id',
@@ -59,7 +59,8 @@ test('replaceCode2table', () => {
         }
     })
     expect(tableCode).toBe(`
-## id
+## id  
+
 <table> 
 <thead>
 <tr>
@@ -83,11 +84,13 @@ test('replaceCode2table', () => {
 <td style="white-space: nowrap;text-align:left">f</td>
 </tr>
 </tbody>
-</table>`)
+</table>
 
-    expect(importPath).toEqual(['./props-all.ts'])
+`)
 
-    const code2 = `@props2table(./non existent path.ts, id)`
+    expect(importPath).toEqual(['/test/props-all.ts'])
+
+    const code2 = `@props2table(/non existent path.ts, id)`
     const rcode = replaceCode2table(code2, {
         'id': {
             title: 'id',
